@@ -1,0 +1,158 @@
+diff -Nur cocotron/Foundation/NSTimeZone/NSTimeZone.m cocotronnew/Foundation/NSTimeZone/NSTimeZone.m
+--- cocotron/Foundation/NSTimeZone/NSTimeZone.m	2015-07-27 15:40:24.000000000 +0000
++++ cocotronnew/Foundation/NSTimeZone/NSTimeZone.m	2015-07-28 12:41:54.338776805 +0000
+@@ -82,8 +82,9 @@
+ +(NSDictionary *)abbreviationDictionary {
+    static NSDictionary *_abbreviationDictionary = nil;
+     if (_abbreviationDictionary == nil) {
+-        NSString *pathToPlist = [[NSBundle bundleForClass:self] pathForResource:@"NSTimeZoneAbbreviations"
+-                                                                         ofType:@"plist"];
++        NSString *pathToPlist = @DATA_DIR @"/cocotron/Foundation/Resources/NSTimeZoneAbbreviations.plist";
++	/*[[NSBundle bundleForClass:self] pathForResource:@"NSTimeZoneAbbreviations"
++                                                                         ofType:@"plist"];*/
+         _abbreviationDictionary = [[NSDictionary allocWithZone:NULL] initWithContentsOfFile:pathToPlist];
+     }
+ 
+diff -Nur cocotron/Foundation/NSUserDefaults/NSUserDefaults.m cocotronnew/Foundation/NSUserDefaults/NSUserDefaults.m
+--- cocotron/Foundation/NSUserDefaults/NSUserDefaults.m	2015-07-27 15:40:24.000000000 +0000
++++ cocotronnew/Foundation/NSUserDefaults/NSUserDefaults.m	2015-07-28 12:41:54.338776805 +0000
+@@ -68,8 +68,8 @@
+ }
+ 
+ -(void)registerFoundationDefaults {
+-   NSString     *path=[[NSBundle bundleForClass:[self class]] 
+-                  pathForResource:@"NSUserDefaults" ofType:@"plist"];
++   NSString     *path=@DATA_DIR @"/cocotron/Foundation/Resources/NSUserDefaults.plist";/*[[NSBundle bundleForClass:[self class]] 
++                  pathForResource:@"NSUserDefaults" ofType:@"plist"];*/
+    NSDictionary *plist=[NSDictionary dictionaryWithContentsOfFile:path];
+ 
+    if(plist==nil)
+diff -Nur cocotron/makefiles/Foundation/cocotron-foundation.pc.in cocotronnew/makefiles/Foundation/cocotron-foundation.pc.in
+--- cocotron/makefiles/Foundation/cocotron-foundation.pc.in	1970-01-01 00:00:00.000000000 +0000
++++ cocotronnew/makefiles/Foundation/cocotron-foundation.pc.in	2015-07-28 12:41:54.339776805 +0000
+@@ -0,0 +1,11 @@
++prefix=PREFIX
++exec_prefix=PREFIX
++libdir=LIB_DIR
++includedir=HEADERS_DIR
++
++Name: Foundation 
++Description: A cross platform implementation of the Apple Foundation API
++URL: http://www.cocotron.org 
++Version: 1.0
++Cflags: -I${includedir}
++Libs: -L${libdir} -lFoundation
+diff -Nur cocotron/makefiles/Foundation/Makefile cocotronnew/makefiles/Foundation/Makefile
+--- cocotron/makefiles/Foundation/Makefile	2015-07-28 12:41:44.621776979 +0000
++++ cocotronnew/makefiles/Foundation/Makefile	2015-07-28 12:42:44.425775908 +0000
+@@ -54,10 +54,14 @@
+ 
+ LDFLAGS += -lssl -lcrypto
+ 
+-include ../Makefiles/Makefile.framework
+ DESTDIR=
+-HEADERS_DIR=/usr/include/cocotron
+-LIB_DIR=/usr/lib
++PREFIX=/usr
++HEADERS_DIR=$(PREFIX)/include/cocotron
++LIB_DIR=$(PREFIX)/lib
++DATA_DIR=$(PREFIX)/share
++
++include ../Makefiles/Makefile.framework
++
+ install_headers = \
+     mkdir -p $(DESTDIR)/$(HEADERS_DIR)/Foundation;\
+     mkdir -p $(DESTDIR)/$(HEADERS_DIR)/CoreFoundation;\
+@@ -87,6 +91,20 @@
+ 	mkdir -p $(DESTDIR)/$(LIB_DIR);\
+ 	install -c -m 0755 ./build/Foundation.framework/Versions/A/libFoundation.so $(DESTDIR)/$(LIB_DIR)/libFoundation.so
+ 
++install_data = \
++	mkdir -p $(DESTDIR)/$(DATA_DIR)/cocotron/Foundation/Resources;\
++	install -c -m 0644 ../../Foundation/English.lproj/NSUserDefaults.plist $(DESTDIR)/$(DATA_DIR)/cocotron/Foundation/Resources/NSUserDefaults.plist;\
++	install -c -m 0644 ../../Foundation/NSTimeZone/NSTimeZoneAbbreviations.plist $(DESTDIR)/$(DATA_DIR)/cocotron/Foundation/Resources/NSTimeZoneAbbreviations.plist;\
++
++install_pkgconfig = \
++	mkdir -p $(DESTDIR)/$(LIB_DIR)/pkgconfig;\
++ 	sed 's|PREFIX|$(PREFIX)|g' cocotron-foundation.pc.in > cocotron-foundation.pc;\
++ 	sed -i 's|LIB_DIR|$(LIB_DIR)|g' cocotron-foundation.pc;\
++ 	sed -i 's|HEADERS_DIR|$(HEADERS_DIR)|g' cocotron-foundation.pc;\
++	install -c -m 0644 cocotron-foundation.pc $(DESTDIR)/$(LIB_DIR)/pkgconfig/cocotron-foundation.pc;\
++		
+ install:
+ 	$(call install_headers)
+ 	$(call install_libs)
++	$(call install_data)
++	$(call install_pkgconfig)
+diff -Nur cocotron/makefiles/Foundation/Makefile.orig cocotronnew/makefiles/Foundation/Makefile.orig
+--- cocotron/makefiles/Foundation/Makefile.orig	2015-07-28 12:41:44.619776979 +0000
++++ cocotronnew/makefiles/Foundation/Makefile.orig	1970-01-01 00:00:00.000000000 +0000
+@@ -1,57 +0,0 @@
+-NAME = Foundation
+-
+-link_files = rm -rf $(1);\
+-	mkdir -p $(1);\
+-	(\
+-		cd $(1);\
+-		ln -s ../../../Foundation/NS*.$(2) .;\
+-		ln -s ../../../Foundation/NS**/CF*.$(2) .;\
+-		ln -s ../../../Foundation/NS**/NS*.$(2) .;\
+-		ln -s ../../../Foundation/xml/NS*.$(2) .;\
+-		ln -s ../../../Foundation/platform_posix/NS*.$(2) .;\
+-		ln -s ../../../Foundation/platform_linux/NS*.$(2) .;\
+-		ln -s ../../../Foundation/NSException/debugHelpers.$(2) .;\
+-		ln -s ../../../Foundation/NSString/unibuffer.$(2) .;\
+-		ln -s ../../../Foundation/NSObject/objc_size_alignment.$(2) .;\
+-		ln -s ../../../Foundation/NSObject/forwarding.$(2) .;\
+-		ln -s ../../../Foundation/NSNetService/bonjour.$(2) .;\
+-		ln -s ../../../CoreFoundation/CF*.$(2) .;\
+-		ln -s ../../../CFNetwork/CF*.$(2) .;\
+-		ln -s ../../../CFSSLHandler_openssl/CF*.$(2) .;\
+-	);\
+-
+-provide_src_files = ${shell (\
+-	test -f .srcFiles || (\
+-		$(call link_files,$(SRC_DIR),m)\
+-		(\
+-			cd $(SRC_DIR);\
+-			test `uname -m` = "i686" && (\
+-				ln -s ../../../Foundation/NSObject/platform_linux/msgSendv-linux.s .;\
+-			);\
+-			test `uname -m` = "x86_64" && (\
+-				ln -s ../../../Foundation/NSObject/platform_linux/msgSendv-x64.s .;\
+-			);\
+-		);\
+-		$(call link_files,$(INCLUDE_DIR),h)\
+-		(\
+-			cd $(INCLUDE_DIR);\
+-			ln -s ../../../Foundation/NSString/Encoding .;\
+-			ln -s ../../../Foundation/Foundation*.h .;\
+-			ln -s ../../../Foundation/NSCharacterSet/bitmapRepresentation.h .;\
+-			ln -s ../../../CoreFoundation/CoreFoundation.h .;\
+-			ln -s ../../../CoreServices/CoreServices.h .;\
+-			ln -s . Foundation;\
+-			ln -s . CoreFoundation;\
+-			ln -s . CoreServices;\
+-			ln -s . CFNetwork;\
+-		);\
+-		touch .srcFiles;\
+-	);\
+-) > /dev/null}
+-
+-
+-STATIC_LIBS = $(GCC_LIB_DIR)/libobjc.a
+-
+-LDFLAGS += -lssl -lcrypto
+-
+-include ../Makefiles/Makefile.framework
+diff -Nur cocotron/makefiles/Makefiles/Makefile.common cocotronnew/makefiles/Makefiles/Makefile.common
+--- cocotron/makefiles/Makefiles/Makefile.common	2015-07-28 12:41:44.631776979 +0000
++++ cocotronnew/makefiles/Makefiles/Makefile.common	2015-07-28 12:41:54.339776805 +0000
+@@ -24,6 +24,7 @@
+ CFLAGS += -Wno-unknown-pragmas
+ CFLAGS += -DOBJC_EXPORT=
+ CFLAGS += -DLINUX -D_GNU_SOURCE -D__LITTLE_ENDIAN__ -DGCC_RUNTIME_3 -D_FORTIFY_SOURCE=1 -DPLATFORM_IS_POSIX -DPLATFORM_USES_BSD_SOCKETS
++CFLAGS += -DDATA_DIR=\"$(DATA_DIR)\"
+ 
+ LDFLAGS += -Wl,--no-undefined -fPIC
+ LDFLAGS += -lc -lgcc_s -lm -ldl -lpthread

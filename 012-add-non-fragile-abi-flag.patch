@@ -1,0 +1,12 @@
+diff -Nur cocotron/makefiles/Makefiles/Makefile.common cocotron.f/makefiles/Makefiles/Makefile.common
+--- cocotron/makefiles/Makefiles/Makefile.common	2015-07-28 12:25:47.978794111 +0000
++++ cocotron.f/makefiles/Makefiles/Makefile.common	2015-07-28 12:26:25.013793447 +0000
+@@ -19,7 +19,7 @@
+ endif
+ 
+ CFLAGS = -I $(INCLUDE_DIR)
+-CFLAGS += -fobjc-exceptions -fconstant-string-class=NSConstantString -fgnu-runtime -fPIC
++CFLAGS += -fobjc-exceptions -fconstant-string-class=NSConstantString -fobjc-nonfragile-abi -fgnu-runtime -fPIC
+ CFLAGS += -g -O2 -Wall -std=gnu99
+ CFLAGS += -Wno-unknown-pragmas
+ CFLAGS += -DOBJC_EXPORT=

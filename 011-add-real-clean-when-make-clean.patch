@@ -1,0 +1,11 @@
+diff -Nur cocotron/makefiles/Makefiles/Makefile.common cocotron.f/makefiles/Makefiles/Makefile.common
+--- cocotron/makefiles/Makefiles/Makefile.common	2015-07-28 12:24:57.535795014 +0000
++++ cocotron.f/makefiles/Makefiles/Makefile.common	2015-07-28 12:25:06.668794850 +0000
+@@ -94,6 +94,7 @@
+ 
+ .PHONY: clean
+ clean:
++	rm -rf include src .srcFiles *.pc
+ 	rm -rf $(BUILD_DIR)
+ 
+ .PHONY: _all

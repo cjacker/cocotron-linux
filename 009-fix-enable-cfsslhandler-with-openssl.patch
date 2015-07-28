@@ -1,0 +1,18 @@
+diff -Nur cocotron/makefiles/Foundation/Makefile cocotron.f/makefiles/Foundation/Makefile
+--- cocotron/makefiles/Foundation/Makefile	2015-07-28 12:40:01.213778831 +0000
++++ cocotron.f/makefiles/Foundation/Makefile	2015-07-28 12:40:51.986777921 +0000
+@@ -17,6 +17,7 @@
+ 		ln -s ../../../Foundation/NSNetService/bonjour.$(2) .;\
+ 		ln -s ../../../CoreFoundation/CF*.$(2) .;\
+ 		ln -s ../../../CFNetwork/CF*.$(2) .;\
++		ln -s ../../../CFSSLHandler_openssl/CF*.$(2) .;\
+ 	);\
+ 
+ provide_src_files = ${shell (\
+@@ -51,4 +52,6 @@
+ 
+ STATIC_LIBS = $(GCC_LIB_DIR)/libobjc.a
+ 
++LDFLAGS += -lssl -lcrypto
++
+ include ../Makefiles/Makefile.framework

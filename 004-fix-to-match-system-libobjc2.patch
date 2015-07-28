@@ -1,0 +1,50 @@
+diff -Nur cocotron/Foundation/NSBlocks.m cocotron.f/Foundation/NSBlocks.m
+--- cocotron/Foundation/NSBlocks.m	2015-07-28 12:18:05.850802386 +0000
++++ cocotron.f/Foundation/NSBlocks.m	2015-07-28 12:18:21.293802110 +0000
+@@ -13,6 +13,34 @@
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
+ 
+ 
++//match libobjc2-1.8/class.h
++//since it is a internal header
++//we just copy/paste codes here.
++#if defined(LINUX)
++struct objc_class
++{
++	struct objc_class         *isa;
++	struct objc_class         *super_class;
++	const char                *name;
++	long                       version;
++	unsigned long              info;
++	long                       instance_size;
++	struct objc_ivar_list     *ivars;
++	struct objc_method_list   *methods;
++	void                      *dtable;
++	struct objc_class         *subclass_list;
++	struct objc_class         *sibling_class;
++	struct objc_protocol_list *protocols;
++	struct reference_list     *extra_data;
++	long                       abi_version;
++	int                      **ivar_offsets;
++	struct objc_property_list *properties;
++	intptr_t                   strong_pointers;
++	intptr_t                   weak_pointers;
++};
++#endif
++
++
+ static void init_block_class(void* nsblock,char* class)
+ {
+ 	memcpy(nsblock,objc_getClass(class),sizeof(struct objc_class));
+diff -Nur cocotron/Foundation/NSZone/NSZone.m cocotron.f/Foundation/NSZone/NSZone.m
+--- cocotron/Foundation/NSZone/NSZone.m	2015-07-27 15:40:24.000000000 +0000
++++ cocotron.f/Foundation/NSZone/NSZone.m	2015-07-28 12:18:21.295802110 +0000
+@@ -12,7 +12,7 @@
+ #import <Foundation/NSRaise.h>
+ #import <Foundation/NSZombieObject.h>
+ #import <Foundation/NSDebug.h>
+-#import <objc/objc_arc.h>
++//#import <objc/objc_arc.h>
+ #include <string.h>
+ #ifdef WIN32
+ #include <windows.h>

@@ -1,0 +1,16 @@
+diff -Nur cocotron/Foundation/NSString/NSString.m cocotron.f/Foundation/NSString/NSString.m
+--- cocotron/Foundation/NSString/NSString.m	2015-07-27 15:40:24.000000000 +0000
++++ cocotron.f/Foundation/NSString/NSString.m	2015-07-28 12:27:20.142792460 +0000
+@@ -64,10 +64,12 @@
+ 
+ NSString * const NSCharacterConversionException = @"NSCharacterConversionException";
+ 
++#if !defined(LINUX)
+ // only needed for Darwin ppc
+ struct objc_class _NSConstantStringClassReference;
+ // only needed for Darwin i386
+ int __CFConstantStringClassReference[1];
++#endif
+ 
+ @implementation NSString
+ 

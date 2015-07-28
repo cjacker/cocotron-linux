@@ -1,0 +1,49 @@
+diff -Nur cocotron/CFNetwork/CFHost.m cocotron.f/CFNetwork/CFHost.m
+--- cocotron/CFNetwork/CFHost.m	2015-07-27 15:40:24.000000000 +0000
++++ cocotron.f/CFNetwork/CFHost.m	2015-07-28 12:34:28.216784794 +0000
+@@ -17,8 +17,10 @@
+ #include <pthread.h>
+ 
+ #if defined(WIN32) || defined(LINUX)
++#ifndef MAXHOSTNAMELEN
+ #define MAXHOSTNAMELEN 512
+ #endif
++#endif
+ 
+ typedef enum {
+    CFHostRequestInQueue,
+diff -Nur cocotron/Foundation/NSString/NSMutableString_unicodePtr.m cocotron.f/Foundation/NSString/NSMutableString_unicodePtr.m
+--- cocotron/Foundation/NSString/NSMutableString_unicodePtr.m	2015-07-27 15:40:24.000000000 +0000
++++ cocotron.f/Foundation/NSString/NSMutableString_unicodePtr.m	2015-07-28 12:34:28.216784794 +0000
+@@ -20,6 +20,7 @@
+ #import <Foundation/NSUnicodeCaseMapping.h>
+ #import <Foundation/NSRaiseException.h>
+ #include <string.h>
++#include <stdlib.h>
+ 
+ @implementation NSMutableString_unicodePtr
+ 
+diff -Nur cocotron/Foundation/NSString/NSStringEncoder.m cocotron.f/Foundation/NSString/NSStringEncoder.m
+--- cocotron/Foundation/NSString/NSStringEncoder.m	2015-07-27 15:40:24.000000000 +0000
++++ cocotron.f/Foundation/NSString/NSStringEncoder.m	2015-07-28 12:34:28.215784794 +0000
+@@ -16,7 +16,7 @@
+ #import <Foundation/NSMapTable.h>
+ #import <Foundation/NSRaiseException.h>
+ 
+-@interface _NSEncodingRegistration
++@interface _NSEncodingRegistration : NSObject
+ + (void)registerTable:(uint16_t *)table forEncoding:(CFStringEncoding)encoding;
+ + (uint16_t *)tableForEncoding:(CFStringEncoding)encoding;
+ @end
+diff -Nur cocotron/makefiles/Makefiles/Makefile.common cocotron.f/makefiles/Makefiles/Makefile.common
+--- cocotron/makefiles/Makefiles/Makefile.common	2015-07-28 12:33:28.904785856 +0000
++++ cocotron.f/makefiles/Makefiles/Makefile.common	2015-07-28 12:35:02.313784183 +0000
+@@ -21,7 +21,7 @@
+ CFLAGS = -I $(INCLUDE_DIR)
+ CFLAGS += -fobjc-exceptions -fconstant-string-class=NSConstantString -fobjc-nonfragile-abi -fgnu-runtime -fPIC
+ CFLAGS += -g -O2 -Wall -std=gnu99
+-CFLAGS += -Wno-unknown-pragmas
++CFLAGS += -Wno-unknown-pragmas  -Wno-unused-variable -Wno-format -Wno-deprecated-objc-isa-usage
+ CFLAGS += -DOBJC_EXPORT=
+ CFLAGS += -DLINUX -D_GNU_SOURCE -D__LITTLE_ENDIAN__ -DGCC_RUNTIME_3 -D_FORTIFY_SOURCE=1 -DPLATFORM_IS_POSIX -DPLATFORM_USES_BSD_SOCKETS
+ CFLAGS += -DDATA_DIR=\"$(DATA_DIR)\"

@@ -1,0 +1,12 @@
+diff -Nur cocotron/makefiles/Makefiles/Makefile.common cocotron.f/makefiles/Makefiles/Makefile.common
+--- cocotron/makefiles/Makefiles/Makefile.common	2015-07-27 15:40:24.000000000 +0000
++++ cocotron.f/makefiles/Makefiles/Makefile.common	2015-07-28 12:15:49.517804828 +0000
+@@ -23,7 +23,7 @@
+ CFLAGS += -g -O2 -Wall -std=gnu99
+ CFLAGS += -Wno-unknown-pragmas
+ CFLAGS += -DOBJC_EXPORT=
+-CFLAGS += -DLINUX -D_GNU_SOURCE -D__LITTLE_ENDIAN__ -DGCC_RUNTIME_3 -D_FORTIFY_SOURCE=1
++CFLAGS += -DLINUX -D_GNU_SOURCE -D__LITTLE_ENDIAN__ -DGCC_RUNTIME_3 -D_FORTIFY_SOURCE=1 -DPLATFORM_IS_POSIX -DPLATFORM_USES_BSD_SOCKETS
+ 
+ LDFLAGS += -Wl,--no-undefined -fPIC
+ LDFLAGS += -lc -lgcc_s -lm -ldl -lpthread

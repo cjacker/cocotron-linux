@@ -1,0 +1,47 @@
+diff -Nur cocotron/makefiles/Makefiles/Makefile.common cocotronn/makefiles/Makefiles/Makefile.common
+--- cocotron/makefiles/Makefiles/Makefile.common	2015-07-27 19:03:38.529997716 +0000
++++ cocotronn/makefiles/Makefiles/Makefile.common	2015-07-27 19:03:59.693997337 +0000
+@@ -23,7 +23,8 @@
+ CFLAGS += -g -O2 -Wall -std=gnu99
+ CFLAGS += -Wno-unknown-pragmas
+ CFLAGS += -DOBJC_EXPORT=
+ CFLAGS += -DLINUX -D_GNU_SOURCE -D__LITTLE_ENDIAN__ -DGCC_RUNTIME_3 -D_FORTIFY_SOURCE=1 -DPLATFORM_IS_POSIX -DPLATFORM_USES_BSD_SOCKETS
++CFLAGS += -Wno-deprecated-objc-isa-usage -Wno-unused-variable -Wno-format
+ 
+ LDFLAGS += -Wl,--no-undefined -fPIC
+ LDFLAGS += -lc -lgcc_s -lm -ldl -lpthread
+--- cocotron.orig/./Foundation/NSString/NSStringEncoder.m	2015-07-27 22:25:22.278937209 +0000
++++ cocotron/./Foundation/NSString/NSStringEncoder.m	2015-07-27 22:33:10.079928832 +0000
+@@ -16,7 +16,7 @@
+ #import <Foundation/NSMapTable.h>
+ #import <Foundation/NSRaiseException.h>
+ 
+-@interface _NSEncodingRegistration
++@interface _NSEncodingRegistration : NSObject
+ + (void)registerTable:(uint16_t *)table forEncoding:(CFStringEncoding)encoding;
+ + (uint16_t *)tableForEncoding:(CFStringEncoding)encoding;
+ @end
+--- cocotron/Foundation/NSString/NSMutableString_unicodePtr.m	2015-07-27 15:40:24.000000000 +0000
++++ cocotronn/Foundation/NSString/NSMutableString_unicodePtr.m	2015-07-28 10:40:04.453907711 +0000
+@@ -20,6 +20,7 @@
+ #import <Foundation/NSUnicodeCaseMapping.h>
+ #import <Foundation/NSRaiseException.h>
+ #include <string.h>
++#include <stdlib.h>
+ 
+ @implementation NSMutableString_unicodePtr
+ 
+diff -Nur cocotron.orig/CFNetwork/CFHost.m cocotron/CFNetwork/CFHost.m
+--- cocotron.orig/CFNetwork/CFHost.m	2015-07-27 22:25:22.315937209 +0000
++++ cocotron/CFNetwork/CFHost.m	2015-07-27 22:26:01.257936511 +0000
+@@ -17,8 +17,10 @@
+ #include <pthread.h>
+ 
+ #if defined(WIN32) || defined(LINUX)
++#ifndef MAXHOSTNAMELEN
+ #define MAXHOSTNAMELEN 512
+ #endif
++#endif
+ 
+ typedef enum {
+    CFHostRequestInQueue,

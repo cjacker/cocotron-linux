@@ -1,0 +1,14 @@
+diff -Nur cocotron/Foundation/NSBlocks.m cocotron.f/Foundation/NSBlocks.m
+--- cocotron/Foundation/NSBlocks.m	2015-07-27 15:40:24.000000000 +0000
++++ cocotron.f/Foundation/NSBlocks.m	2015-07-28 12:17:39.701802855 +0000
+@@ -1,8 +1,8 @@
+ #import <Foundation/NSProcessInfo.h>
+ #import <stdio.h>
+ #import <string.h>
+-#include <ringo/compiler_rt/Block_private.h>
+-#include <ringo/compiler_rt/Block.h>
++#include <Block_private.h>
++#include <Block.h>
+ 
+ /* Copyright (c) 2011 Tobias Platen
+  

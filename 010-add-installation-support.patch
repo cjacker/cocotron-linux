@@ -1,0 +1,77 @@
+diff -Nur cocotron/makefiles/Foundation/Makefile cocotron.f/makefiles/Foundation/Makefile
+--- cocotron/makefiles/Foundation/Makefile	2015-07-28 12:17:23.555803144 +0000
++++ cocotron.f/makefiles/Foundation/Makefile	2015-07-28 12:24:30.126795505 +0000
+@@ -52,3 +52,38 @@
+ STATIC_LIBS = $(GCC_LIB_DIR)/libobjc.a
+ 
+ include ../Makefiles/Makefile.framework
++DESTDIR=
++HEADERS_DIR=/usr/include/cocotron
++LIB_DIR=/usr/lib
++install_headers = \
++    mkdir -p $(DESTDIR)/$(HEADERS_DIR)/Foundation;\
++    mkdir -p $(DESTDIR)/$(HEADERS_DIR)/CoreFoundation;\
++    mkdir -p $(DESTDIR)/$(HEADERS_DIR)/CFNetwork;\
++    mkdir -p $(DESTDIR)/$(HEADERS_DIR)/CoreServices;\
++    (\
++        install -c -m 0644 ../../Foundation/NS*.h $(DESTDIR)/$(HEADERS_DIR)/Foundation;\
++        install -c -m 0644 ../../Foundation/NS**/CF*.h $(DESTDIR)/$(HEADERS_DIR)/Foundation;\
++        install -c -m 0644 ../../Foundation/NS**/NS*.h $(DESTDIR)/$(HEADERS_DIR)/Foundation;\
++        install -c -m 0644 ../../Foundation/xml/NS*.h $(DESTDIR)/$(HEADERS_DIR)/Foundation;\
++        install -c -m 0644 ../../Foundation/platform_posix/NS*.h $(DESTDIR)/$(HEADERS_DIR)/Foundation;\
++        install -c -m 0644 ../../Foundation/platform_linux/NS*.h $(DESTDIR)/$(HEADERS_DIR)/Foundation;\
++        install -c -m 0644 ../../Foundation/NSException/debugHelpers.h $(DESTDIR)/$(HEADERS_DIR)/Foundation;\
++        install -c -m 0644 ../../Foundation/NSString/unibuffer.h $(DESTDIR)/$(HEADERS_DIR)/Foundation;\
++        install -c -m 0644 ../../Foundation/NSObject/objc_size_alignment.h $(DESTDIR)/$(HEADERS_DIR)/Foundation;\
++        install -c -m 0644 ../../Foundation/NSObject/forwarding.h $(DESTDIR)/$(HEADERS_DIR)/Foundation;\
++        install -c -m 0644 ../../Foundation/NSNetService/bonjour.h $(DESTDIR)/$(HEADERS_DIR)/Foundation;\
++        install -c -m 0644 ../../CoreFoundation/CF*.h $(DESTDIR)/$(HEADERS_DIR)/CoreFoundation;\
++        install -c -m 0644 ../../CFNetwork/CF*.h $(DESTDIR)/$(HEADERS_DIR)/CFNetwork;\
++        install -c -m 0644 ../../Foundation/Foundation*.h $(DESTDIR)/$(HEADERS_DIR)/Foundation;\
++        install -c -m 0644 ../../Foundation/NSCharacterSet/bitmapRepresentation.h $(DESTDIR)/$(HEADERS_DIR)/Foundation;\
++        install -c -m 0644 ../../CoreFoundation/CoreFoundation.h $(DESTDIR)/$(HEADERS_DIR)/CoreFoundation;\
++        install -c -m 0644 ../../CoreServices/CoreServices.h $(DESTDIR)/$(HEADERS_DIR)/CoreServices;\
++    );\
++
++install_libs = \
++	mkdir -p $(DESTDIR)/$(LIB_DIR);\
++	install -c -m 0755 ./build/Foundation.framework/Versions/A/libFoundation.so $(DESTDIR)/$(LIB_DIR)/libFoundation.so
++
++install:
++	$(call install_headers)
++	$(call install_libs)
+diff -Nur cocotron/makefiles/Makefile cocotron.f/makefiles/Makefile
+--- cocotron/makefiles/Makefile	2015-07-27 15:40:24.000000000 +0000
++++ cocotron.f/makefiles/Makefile	2015-07-28 12:24:30.126795505 +0000
+@@ -14,3 +14,6 @@
+ .PHONY: clean
+ clean:
+ 	@$(foreach project,$(PROJECTS),$(MAKE) -C $(project) clean;)
++
++install: all
++	@$(foreach project,$(PROJECTS),$(MAKE) -C $(project) install;)
+diff -Nur cocotron/makefiles/Makefiles/Makefile.common cocotron.f/makefiles/Makefiles/Makefile.common
+--- cocotron/makefiles/Makefiles/Makefile.common	2015-07-28 12:16:23.810804214 +0000
++++ cocotron.f/makefiles/Makefiles/Makefile.common	2015-07-28 12:24:30.128795505 +0000
+@@ -13,9 +13,9 @@
+ 
+ GCC_DIR = /usr/
+ ifeq ($(shell uname -m),x86_64)
+-GCC_LIB_DIR = /usr/local/lib
++GCC_LIB_DIR = /usr/lib
+ else
+-GCC_LIB_DIR = /usr/local/lib
++GCC_LIB_DIR = /usr/lib
+ endif
+ 
+ CFLAGS = -I $(INCLUDE_DIR)
+diff -Nur cocotron/makefiles/test/Makefile cocotron.f/makefiles/test/Makefile
+--- cocotron/makefiles/test/Makefile	2015-07-27 15:40:24.000000000 +0000
++++ cocotron.f/makefiles/test/Makefile	2015-07-28 12:24:30.127795505 +0000
+@@ -2,3 +2,6 @@
+ FRAMEWORKS = Foundation
+ 
+ include ../Makefiles/Makefile.app
++
++install:
++	echo "nothing to do"

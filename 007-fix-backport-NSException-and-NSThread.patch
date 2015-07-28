@@ -1,0 +1,109 @@
+diff -Nur cocotron/Foundation/NSException/NSException.m cocotron.f/Foundation/NSException/NSException.m
+--- cocotron/Foundation/NSException/NSException.m	2015-07-27 15:40:24.000000000 +0000
++++ cocotron.f/Foundation/NSException/NSException.m	2015-07-28 12:22:32.389797613 +0000
+@@ -43,6 +43,52 @@
+      reason:NSStringWithFormatArguments(format,arguments) userInfo:nil] raise];
+ }
+ 
++#if defined(LINUX)
++void __NSPushExceptionFrame(NSExceptionFrame *frame) {
++   frame->parent=NSThreadCurrentHandler();
++   frame->exception=nil;
++
++   NSThreadSetCurrentHandler(frame);
++}
++
++void __NSPopExceptionFrame(NSExceptionFrame *frame) {
++   NSThreadSetCurrentHandler(frame->parent);
++}
++
++static void defaultHandler(NSException *exception){
++   fprintf(stderr,"*** Uncaught exception <%s> *** %s\n",[[exception name] cString],[[exception reason] cString]);
++}
++
++void _NSRaiseException(NSException *exception) {
++   NSExceptionFrame *top=NSThreadCurrentHandler();
++
++   if(top==NULL){
++    NSUncaughtExceptionHandler *proc=NSGetUncaughtExceptionHandler();
++
++    if(proc==NULL)
++     defaultHandler(exception);
++    else
++     proc(exception);
++   }
++   else {
++    NSThreadSetCurrentHandler(top->parent);
++
++    top->exception=exception;
++
++    longjmp(top->state,1);
++   }
++}
++
++NSUncaughtExceptionHandler *NSGetUncaughtExceptionHandler(void) {
++   return NSThreadUncaughtExceptionHandler();
++}
++
++void NSSetUncaughtExceptionHandler(NSUncaughtExceptionHandler *proc) {
++   NSThreadSetUncaughtExceptionHandler(proc);
++}
++
++#endif //LINUX
++
+ -initWithName:(NSString *)name reason:(NSString *)reason
+   userInfo:(NSDictionary *)userInfo {
+    _name=[name copy];
+@@ -91,7 +137,11 @@
+    }
+    [_callStack release];
+    _callStack=[[NSThread callStackReturnAddresses] retain];
++#if !defined(LINUX)
+    objc_exception_throw(self);
++#else
++   _NSRaiseException(self);
++#endif
+ }
+ 
+ -(NSString *)name {
+diff -Nur cocotron/Foundation/NSThread/NSThread.h cocotron.f/Foundation/NSThread/NSThread.h
+--- cocotron/Foundation/NSThread/NSThread.h	2015-07-27 15:40:24.000000000 +0000
++++ cocotron.f/Foundation/NSThread/NSThread.h	2015-07-28 12:22:32.391797613 +0000
+@@ -21,6 +21,9 @@
+     NSLock *_sharedObjectLock;
+     NSAutoreleasePool *_currentPool;
+     NSExceptionFrame *_currentHandler;
++#if defined(LINUX)
++    NSUncaughtExceptionHandler *_uncaughtExceptionHandler;
++#endif
+     NSString *_name;
+     SEL _selector;
+     id _argument;
+diff -Nur cocotron/Foundation/NSThread/NSThread.m cocotron.f/Foundation/NSThread/NSThread.m
+--- cocotron/Foundation/NSThread/NSThread.m	2015-07-27 15:40:24.000000000 +0000
++++ cocotron.f/Foundation/NSThread/NSThread.m	2015-07-28 12:22:32.390797613 +0000
+@@ -349,6 +349,24 @@
+    NSPlatformCurrentThread()->_currentPool=pool;
+ }
+ 
++#if defined(LINUX)
++NSExceptionFrame *NSThreadCurrentHandler(void) {
++   return NSPlatformCurrentThread()->_currentHandler;
++}
++
++void NSThreadSetCurrentHandler(NSExceptionFrame *handler) {
++   NSPlatformCurrentThread()->_currentHandler=handler;
++}
++
++NSUncaughtExceptionHandler *NSThreadUncaughtExceptionHandler(void) {
++   return NSPlatformCurrentThread()->_uncaughtExceptionHandler;
++}
++
++void NSThreadSetUncaughtExceptionHandler(NSUncaughtExceptionHandler *function) {
++   NSPlatformCurrentThread()->_uncaughtExceptionHandler=function;
++}
++#endif //LINUX
++
+ @end
+ 
+ @implementation NSObject(NSThread)

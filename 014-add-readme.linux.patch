@@ -1,0 +1,33 @@
+diff -Nur cocotron/README.linux cocotron.f/README.linux
+--- cocotron/README.linux	1970-01-01 00:00:00.000000000 +0000
++++ cocotron.f/README.linux	2015-07-28 12:36:28.101782647 +0000
+@@ -0,0 +1,29 @@
++How to build and install cocotron foundation library under linux.
++
++1, llvm/clang, libobjc2 and libBlocksRuntime need to be installed.
++llvm/clang : http://www.llvm.org
++libBlocksRuntime : https://github.com/mheily/blocks-runtime/releases/download/v0.4.1/libblocksruntime-0.4.1.tar.gz
++libobjc2 : https://github.com/gnustep/libobjc2/archive/v1.8.tar.gz
++
++2, build cocotron
++$cd makefiles
++$make 
++
++3, install or package cocotron
++If you want to install cocotron foundation library to your system directly:
++
++$cd makefiles
++$make install
++
++Above commands will :
++install libFoundation.so to /usr/lib
++install headers to /usr/include/cocotron
++install plist resources to /usr/share/cocotron
++install pkgconfig file to /usr/lib/pkgconfig
++
++If you need to install to alternative root or need to package cocotron:
++use below command:
++$make install DESTDIR=<your root>.
++
++4,usage
++clang -o test test.m `pkg-config --libs --cflags cocotron-foundation` 
